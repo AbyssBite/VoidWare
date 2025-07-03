@@ -1,0 +1,23 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.so
+
+# Virtual environment
+venv/
+env/
+
+# Environment variables
+.env
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.swp
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Upload folder (optional)
+uploads/

