@@ -9,7 +9,7 @@
 - Fully client-side + Python backend
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/bad-internet-capture.git
+git clone https://github.com/AbyssBite/VoidWare.git
 cd bad-internet-capture
 python -m venv venv
 source venv/bin/activate   # or venv\Scripts\activate
