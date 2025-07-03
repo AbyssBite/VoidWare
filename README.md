@@ -10,7 +10,7 @@
 
 ```bash
 git clone https://github.com/AbyssBite/VoidWare.git
-cd bad-internet-capture
+cd VoidWare
 python -m venv venv
 source venv/bin/activate   # or venv\Scripts\activate
 pip install -r requirements.txt
