@@ -3,7 +3,7 @@ import re
 import base64
 from flask import Flask, request, jsonify, send_from_directory
 from dotenv import load_dotenv
-from telegram_utils import send_photo_to_telegram
+from .telegram_utils import send_photo_to_telegram
 
 # Load environment variables
 load_dotenv()

