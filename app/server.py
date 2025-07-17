@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from .telegram_utils import send_photo_to_telegram
 
 # Load environment variables
-load_dotenv()
+load_dotenv(override=True)
 
 TIKTOK_REDIRECT_URL = os.getenv("TIKTOK_REDIRECT_URL")
 
